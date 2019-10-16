@@ -7,6 +7,8 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+import matplotlib.animation as animation
 
 
 # In[2]:
@@ -32,6 +34,28 @@ def plot(X1_pos,X1_neg,X2_pos,X2_neg,w):
 # In[3]:
 
 
+
+def animateplot(w,X1_pos,X1_neg,X2_pos,X2_neg):
+    axes.plot(X1_pos,X2_pos,'bo')    #positive class
+    axes.plot(X1_neg,X2_neg,'r+')   #negative class
+    x = np.linspace(-100, 100, 20)
+    axes.plot(x, (5*x + 10)/(8), linestyle='solid', label="Target Function")   #target function
+    
+    a = w[1]
+    b = w[2]
+    c = w[0]
+    
+#     axes.xlabel("X1")
+#     axes.ylabel("X2")
+#     axes.title("Linearly Seperable Data")
+#     axes.legend()
+    axes.clear()
+    axes.plot(x, (a*x + c)/(-b), linestyle='dashed',label="Hypothesis Function")   #classifier function
+
+
+# In[4]:
+
+
 #generating linearly seperable dataset
 #line => ax +by +c  = 0
 a = 5
@@ -45,7 +69,7 @@ def ispositive(x1,x2):
     
 
 
-# In[4]:
+# In[5]:
 
 
 def dataset_construction(size):
@@ -71,7 +95,7 @@ def dataset_construction(size):
     return dataset
 
 
-# In[5]:
+# In[6]:
 
 
 #segregating dataset acc. to class
@@ -89,7 +113,7 @@ for i in range(20):
         X2_neg.append(dataset[i][1])
 
 
-# In[6]:
+# In[7]:
 
 
 plt.figure()
@@ -103,18 +127,18 @@ plt.legend()
 plt.title("Linearly Seperable Data")
 
 
-# In[7]:
+# In[8]:
 
 
-w0 = random.randrange(0,100,1)
-w1 = random.randrange(0,100,1)
-w2 = random.randrange(0,100,1)
+w0 = random.random()
+w1 = random.random()
+w2 = random.random()
 w = np.array([w0,w1,w2])
 #alternate ways
 # w = np.random.rand(1,3)
 
 
-# In[8]:
+# In[9]:
 
 
 #adding x0 in X
@@ -126,13 +150,21 @@ w_transition = []
 w_transition.append(w)
 
 
-# In[9]:
+# In[20]:
 
 
 #perceptron learning algorithm
 def perceptron_learning_algo(X,Y,learning_rate,w):
     misclassified_samples  = True
     iterations = 0
+    fig = plt.figure()
+    x = np.linspace(-100, 100, 20)
+    plt.ylim(-100,100)
+    plt.plot(x, (5*x + 10)/(8), linestyle='solid', label="Target Function")   #target function
+    a = w[1]
+    b = w[2]
+    c = w[0]
+    plt.plot(x, (a*x + c)/(-b), linestyle='dashed')   #classifier function
     while(misclassified_samples):
         misclassified_samples = False
         iterations+=1
@@ -142,17 +174,59 @@ def perceptron_learning_algo(X,Y,learning_rate,w):
                 misclassified_samples = True
                 w = w + learning_rate*x*Y[idx]
                 w_transition.append(w)
-#                 plot(X1_pos,X1_neg,X2_pos,X2_neg,w)
-    return (w,iterations)                
+                
+                a = w[1]
+                b = w[2]
+                c = w[0]
+                x_ = np.linspace(-100, 100, 20)
+                plt.plot(x_, (a*x_ + c)/(-b), linestyle='dashed')   #classifier function
+                plt.pause(0.05)
+#                 axes.clear()
+#                 animateplot(axes,X1_pos,X1_neg,X2_pos,X2_neg,w)
+#     ani = animation.FuncAnimation(fig,animateplot,interval = 1000)
+    a = w[1]
+    b = w[2]
+    c = w[0]
+    x = np.linspace(-100, 100, 20)
+    plt.plot(x, (a*x + c)/(-b), linestyle='solid',label="Hypothesis Function")   #classifier function
+    plt.xlabel("X1")
+    plt.ylabel("X2")
+    plt.legend()
+    plt.show()
+    return (w,iterations,w_transition)                
 
 
-# In[10]:
+# In[21]:
 
 
-W,iterations = perceptron_learning_algo(x,y,1,w)
+W,iterations,W_transition = perceptron_learning_algo(x,y,1,w)
+
+def plotting(W):
+    for w_ in W:
+        a = w_[1]
+        b = w_[2]
+        c = w_[0]
+        x = np.linspace(-100, 100, 20)
+        axes.plot(x, (5*x + 10)/(8), linestyle='solid', label="Target Function")   #target function
+    
+        axes.plot(x, (a*x + c)/(-b), linestyle='dotted')   #classifier function
+    
+def animate(i):
+    axes.plot(X1_pos,X2_pos,'bo')    #positive class
+    axes.plot(X1_neg,X2_neg,'r+')   #negative class
+    axes.clear()
+    plotting(W_transition)
+# ani = animation.FuncAnimation(fig,animate,interval = 10000)
+# plt.show()
 
 
-# In[11]:
+# In[ ]:
+
+
+
+
+
+# In[39]:
 
 
 plot(X1_pos,X1_neg,X2_pos,X2_neg,W)
@@ -223,7 +297,7 @@ w_transition.append(w)
 # In[17]:
 
 
-W,iterations = perceptron_learning_algo(x,y,1,w)
+W,iterations,W_transition = perceptron_learning_algo(x,y,1,w)
 
 
 # In[18]:
